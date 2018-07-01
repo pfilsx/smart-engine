@@ -1,0 +1,11 @@
+# phpstorm project files
+.idea
+
+# composer vendor dir
+/vendor
+
+# node modules for less
+/node_modules
+
+# composer itself is not needed
+composer.phar

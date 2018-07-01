@@ -1,0 +1,29 @@
+{
+  "name": "smart-engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.php",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/pfilsx/smart-engine.git"
+  },
+  "keywords": [
+    "smart",
+    "engine",
+    "seo"
+  ],
+  "author": "pfilsx",
+  "license": "GPL",
+  "bugs": {
+    "url": "https://github.com/pfilsx/smart-engine/issues"
+  },
+  "homepage": "https://github.com/pfilsx/smart-engine#README",
+  "private": true,
+  "devDependencies": {
+    "gulp": "3.9.1",
+    "gulp-less": "3.5.0"
+  }
+}
