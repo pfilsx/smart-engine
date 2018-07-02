@@ -123,7 +123,7 @@
                                         </div>
 
                                         <button type="button" class="btn btn-main" onclick="saveMetaTagTab();">Сохранить</button>
-                                        <button type="button" class="btn btn-default launch-demo-meta-tag">Просмотр</button>
+                                        <button type="button" class="btn btn-default" onclick="tagsPreview('meta-tags')">Просмотр</button>
                                         <button type="button" class="btn btn-default" onclick="cancel('meta-tags')">Отмена</button>
                                     </form>
                                 </div>
@@ -167,14 +167,16 @@
         </div>
 
         <!-- Modal -->
-        <div class="modal fade" id="modal-demo-meta-tags" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal fade" id="modal-preview-tags" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Предварительный просмотр мета-тегов</h4>
+                        <h4 class="modal-title">Предварительный просмотр мета-тегов</h4>
                     </div>
-                    <div class="modal-body"></div>
+                    <div class="modal-body">
+                        <pre><code></code></pre>
+                    </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Закрыть</button>
                     </div>

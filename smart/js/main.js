@@ -108,7 +108,7 @@ function addMetaBlock(obj)
     $(obj).closest('form').find('.block-meta').append(fields);
 }
 function cancel(type){
-    var form = type === 'meta-tags' ? $('#meta-tag-form') : $('TODO');
+    var form = type === 'meta-tags' ? $('#meta-tag-form') : $('#og-tag-form');
     var url = form.attr('action');
     var tObj = Object.create(ajaxTpl);
     tObj.url = url;
@@ -149,5 +149,18 @@ function cancel(type){
         }
     };
     $.ajax(tObj);
+}
+function tagsPreview(type){
+    var modal = $('#modal-preview-tags');
+    var form = type === 'meta-tags' ? $('#meta-tag-form') : $('#og-tag-form');
+    var data = '';
+    form.find('.block-meta-item').each(function(idx, obj){
+       var elem = $(obj);
+       data += type === 'meta-tags'
+           ? '<meta name="'+ elem.find('input[name="name"]').val() +'" content="'+ elem.find('input[name="value"]').val() +'">\n'
+           : '<meta property="'+ elem.find('input[name="name"]').val() +'" content="'+ elem.find('input[name="value"]').val() +'">\n'
+    });
 
+    modal.find('pre code').text(data);
+    modal.modal('show');
 }

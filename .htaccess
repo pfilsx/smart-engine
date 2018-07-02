@@ -7,7 +7,6 @@ RewriteCond %{REQUEST_FILENAME} !-d
 # otherwise forward it to index.php
 RewriteRule ^.*$ index.php
 RewriteRule ^smart/(?<!js|css|webfonts)$ index.php
-#RewriteRule ^smart/(js|css|webfonts)/(.*)$ smart/$1/$2
 
 
 
