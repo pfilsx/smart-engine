@@ -47,7 +47,7 @@
                         <div class="col-md-9">
                             <div class="tab-content">
                                 <div id="panel1" class="tab-pane fade in active">
-                                    <form id="main-form" action="<?= $this->getBaseUrl().'/smart/save' ?>" method="post">
+                                    <form id="main-form" action="<?= $this->getBaseUrl().'/smart/handler' ?>" method="post">
                                         <div class="cl-form-group">
                                             <label class="cl-label" for="title">Название сайта</label>
                                             <input type="text" placeholder="Пример: My Awesome Site" class="cl-input" name="title" id="title" value="<?= $this->getParam('title') ?>">
@@ -68,23 +68,63 @@
                                     </form>
                                 </div>
                                 <div id="panel2" class="tab-pane fade">
-                                    <form id="meta-tag-form" action="action.php" method="post">
+                                    <form id="meta-tag-form" action="<?= $this->getBaseUrl().'/smart/handler' ?>" method="post">
                                         <div class="row">
                                             <div class="col-md-5"><label class="cl-label" for="">Название мета-тега</label></div>
                                             <div class="col-md-5"><label class="cl-label" for="">Значение мета-тега</label></div>
                                         </div>
                                         <div class="block-meta">
-
+                                            <?php if (empty($this->getParam('meta-tags'))) { ?>
+                                                <div class="block-meta-item">
+                                                    <div class="row">
+                                                        <div class="col-md-5">
+                                                            <div class="cl-form-group">
+                                                                <input type="text" placeholder="Пример: description" class="cl-input" name="name">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <div class="cl-form-group">
+                                                                <input type="text" placeholder="Пример: smart-описание" class="cl-input" name="value">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 text-center">
+                                                            <a href="#" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php } else { ?>
+                                                <?php foreach ($this->getParam('meta-tags') as $name => $value) { ?>
+                                                    <div class="block-meta-item">
+                                                        <div class="row">
+                                                            <input type="hidden" name="type" value="meta_tags">
+                                                            <div class="col-md-5">
+                                                                <div class="cl-form-group">
+                                                                    <input type="text" placeholder="Пример: description" class="cl-input" name="name" value="<?= $name ?>">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                <div class="cl-form-group">
+                                                                    <input type="text" placeholder="Пример: smart-описание" class="cl-input" name="value" value="<?= $value ?>">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-2 text-center">
+                                                                <a href="#" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <?php } ?>
+                                            <?php } ?>
                                         </div>
 
                                         <div class="row">
                                             <div class="col-md-10 text-center">
-                                                <a href="#" class="meta-plus" onclick="addMetaBlock(this, 'meta_tags');"><i class="fal fa-plus-circle"></i></a>
+                                                <a href="#" class="meta-plus" onclick="addMetaBlock(this);"><i class="fal fa-plus-circle"></i></a>
                                             </div>
                                         </div>
 
                                         <button type="button" class="btn btn-main" onclick="saveMetaTagTab();">Сохранить</button>
-                                        <button type="button" class="btn btn-default launch-demo-meta-tag">Демо</button>
+                                        <button type="button" class="btn btn-default launch-demo-meta-tag">Просмотр</button>
+                                        <button type="button" class="btn btn-default" onclick="cancel('meta-tags')">Отмена</button>
                                     </form>
                                 </div>
                                 <div id="panel3" class="tab-pane fade">

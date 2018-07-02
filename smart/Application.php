@@ -3,6 +3,9 @@
 
 namespace smart;
 
+use Exception;
+use Loader;
+
 
 /**
  * @property array $config
@@ -37,14 +40,14 @@ class Application
 
     public function __construct()
     {
-        $this->_configurationFile = implode(DIRECTORY_SEPARATOR, [\Loader::$rootDir, 'smart', 'config', 'config.data']);
-        $smartPath = implode(DIRECTORY_SEPARATOR, [\Loader::$rootDir, 'smart', 'views']);
+        $this->_configurationFile = implode(DIRECTORY_SEPARATOR, [Loader::$rootDir, 'smart', 'config', 'config.data']);
+        $smartPath = implode(DIRECTORY_SEPARATOR, [Loader::$rootDir, 'smart', 'views']);
         $this->_smartRoutes = [
             'smart' => $smartPath . DIRECTORY_SEPARATOR . 'index.php',
             'smart/index' => $smartPath . DIRECTORY_SEPARATOR . 'index.php',
             'smart/login' => $smartPath . DIRECTORY_SEPARATOR . 'login.php',
             'smart/logout' => $smartPath . DIRECTORY_SEPARATOR . 'login.php',
-            'smart/save' => $smartPath . DIRECTORY_SEPARATOR . 'save.php'
+            'smart/handler' => $smartPath . DIRECTORY_SEPARATOR . 'handler.php'
         ];
         if (is_file($this->_configurationFile)) {
             $this->loadConfiguration();
@@ -64,7 +67,7 @@ class Application
         try {
             require $_file_;
             echo ob_get_clean();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             while (ob_get_level() > $_obInitialLevel_) {
                 if (!@ob_end_clean()) {
                     ob_clean();
@@ -124,7 +127,7 @@ class Application
             return $this->_smartRoutes[$route];
         }
         $resultRoute = implode(DIRECTORY_SEPARATOR, [
-            \Loader::$rootDir,
+            Loader::$rootDir,
             'views',
             (empty($route) ? 'index' : str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $route))
         ]);
@@ -138,7 +141,7 @@ class Application
                 return $resultRoute;
             }
         }
-        throw new \Exception("View script not found: '$resultRoute'");
+        throw new Exception("View script not found: '$resultRoute'");
     }
 
     public function getBaseUrl()
@@ -165,7 +168,7 @@ class Application
             } elseif (!empty($_SERVER['DOCUMENT_ROOT']) && strpos($scriptFile, $_SERVER['DOCUMENT_ROOT']) === 0) {
                 $this->_scriptUrl = str_replace('\\', '/', str_replace($_SERVER['DOCUMENT_ROOT'], '', $scriptFile));
             } else {
-                throw new \Exception('Unable to determine the entry script URL.');
+                throw new Exception('Unable to determine the entry script URL.');
             }
         }
         return $this->_scriptUrl;
@@ -176,7 +179,7 @@ class Application
         if (isset($_SERVER['SCRIPT_FILENAME'])) {
             return $_SERVER['SCRIPT_FILENAME'];
         } else {
-            throw new \Exception('Unable to determine the entry script file path.');
+            throw new Exception('Unable to determine the entry script file path.');
         }
     }
 
@@ -187,9 +190,9 @@ class Application
         if (method_exists($this, $getter)) {
             return $this->$getter();
         } elseif (method_exists($this, 'set' . ucfirst($name))) {
-            throw new \Exception('Getting write-only property: ' . get_class($this) . '::' . $name);
+            throw new Exception('Getting write-only property: ' . get_class($this) . '::' . $name);
         } else {
-            throw new \Exception('Getting unknown property: ' . get_class($this) . '::' . $name);
+            throw new Exception('Getting unknown property: ' . get_class($this) . '::' . $name);
         }
     }
 
@@ -199,9 +202,9 @@ class Application
         if (method_exists($this, $setter)) {
             call_user_func([$this, $setter], $value);
         } elseif (method_exists($this, 'get' . ucfirst($name))) {
-            throw new \Exception('Setting read-only property: ' . get_class($this) . '::' . $name);
+            throw new Exception('Setting read-only property: ' . get_class($this) . '::' . $name);
         } else {
-            throw new \Exception('Setting unknown property: ' . get_class($this) . '::' . $name);
+            throw new Exception('Setting unknown property: ' . get_class($this) . '::' . $name);
         }
     }
     //endregion

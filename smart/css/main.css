@@ -219,3 +219,28 @@ input::-webkit-input-placeholder {
   background-color: white;
   opacity: 0.6;
 }
+.meta-plus {
+  text-decoration: none;
+  color: #03639e;
+  font-size: 40px;
+  position: relative;
+  -webkit-transition: all ease-in-out 0.1s;
+  -moz-transition: all ease-in-out 0.1s;
+  -o-transition: all ease-in-out 0.1s;
+  transition: all ease-in-out 0.1s;
+}
+.meta-plus:hover {
+  color: #035385;
+}
+.meta-times {
+  text-decoration: none;
+  color: #b5b5b5;
+  font-size: 40px;
+  -webkit-transition: all ease-in-out 0.1s;
+  -moz-transition: all ease-in-out 0.1s;
+  -o-transition: all ease-in-out 0.1s;
+  transition: all ease-in-out 0.1s;
+}
+.meta-times:hover {
+  color: #FF4C41;
+}
