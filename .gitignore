@@ -6,6 +6,7 @@
 
 # node modules for less
 /node_modules
+package-lock.json
 
 # composer itself is not needed
 composer.phar
