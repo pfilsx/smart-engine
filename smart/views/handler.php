@@ -15,8 +15,18 @@ try {
             }
             die(json_encode(['success' => true, 'data' => $this->getParam($_POST['param'])]));
         }
+        case 'robots-tab':{
+            if (!isset($_POST['data'])){
+                die(json_encode(['success' => false, 'message' => 'Произошла ошибка: не заданы параметры для выполнения']));
+            }
+            $this->setRobots($_POST['data']);
+            die(json_encode(['success' => true, 'message' => 'Изменения успешно сохранены']));
+        }
         case 'main-tab':
         case 'meta-tab':
+        case 'og-tab':
+        case 'metrics-tab':
+        case 'code-tab':
             {
                 if (!isset($_POST['data'])){
                     die(json_encode(['success' => false, 'message' => 'Произошла ошибка: не заданы параметры для выполнения']));

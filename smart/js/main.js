@@ -1,6 +1,15 @@
 window.onbeforeunload = function () {
     loading('show');
 };
+$('.cl-tab-nav a').on('click', function(e){
+    e.preventDefault();
+    $(this).tab('show');
+    window.location.hash = $(this).attr('href');
+});
+var hash = window.location.hash;
+$('.cl-tab-nav a[href="' + hash + '"]').tab('show');
+
+
 function loading(action)
 {
     if(action === 'show'){
@@ -17,7 +26,7 @@ var notify = new AlertNotify({
     animateOut: 'fade',
     timeIn: 500,
     timeOut: 1500,
-    duration: 115500,
+    duration: 5500,
     classPrefix: 'alert-notify'
 });
 var ajaxTpl = {
@@ -61,14 +70,64 @@ function saveMetaTagTab(){
     var data = {'name': 'meta-tags', 'value': {}};
     var names = [];
     form.find('.block-meta-item').each(function(idx, elem){
-        var name = $(elem).find('input[name="name"]').val();
-        var value = $(elem).find('input[name="value"]').val();
-        if (names.indexOf(name) === -1){
-            data.value[name] = value;
-            names.push(name);
+        var name = $(elem).find('input[name="name"]').val().trim().toLowerCase();
+        var value = $(elem).find('input[name="value"]').val().trim();
+        if (name.length > 0 && value.length > 0){
+            if (names.indexOf(name) === -1){
+                data.value[name] = value;
+                names.push(name);
+            }
         }
     });
     tObj.data.data = [data];
+    $.ajax(tObj);
+}
+function saveOGTagTab(){
+    var form = $('#og-tag-form');
+    var url = form.attr('action');
+    var tObj = Object.create(ajaxTpl);
+    tObj.url = url;
+    tObj.data.action = 'og-tab';
+    var data = {'name': 'og-tags', 'value': {}};
+    var names = [];
+    form.find('.block-meta-item').each(function(idx, elem){
+        var name = $(elem).find('input[name="name"]').val().trim().toLowerCase();
+        var value = $(elem).find('input[name="value"]').val().trim();
+        if (name.length > 0 && value.length > 0){
+            if (names.indexOf(name) === -1){
+                data.value[name] = value;
+                names.push(name);
+            }
+        }
+    });
+    tObj.data.data = [data];
+    $.ajax(tObj);
+}
+function saveMetricsTab(){
+    var form = $('#metrics-form');
+    var url = form.attr('action');
+    var tObj = Object.create(ajaxTpl);
+    tObj.url = url;
+    tObj.data.action = 'metrics-tab';
+    tObj.data.data = form.serializeArray();
+    $.ajax(tObj);
+}
+function saveRobotsTab(){
+    var form = $('#robots-form');
+    var url = form.attr('action');
+    var tObj = Object.create(ajaxTpl);
+    tObj.url = url;
+    tObj.data.action = 'robots-tab';
+    tObj.data.data = form.find('textarea[name="robots"]').val();
+    $.ajax(tObj);
+}
+function saveCodeTab(){
+    var form = $('#code-form');
+    var url = form.attr('action');
+    var tObj = Object.create(ajaxTpl);
+    tObj.url = url;
+    tObj.data.action = 'code-tab';
+    tObj.data.data = form.serializeArray();
     $.ajax(tObj);
 }
 /**
@@ -86,18 +145,17 @@ function removeMetaBlock(obj)
 /**
  * Add new meta-block
  */
-function addMetaBlock(obj)
-{
+function addMetaBlock(obj, type) {
     var fields = '<div class="block-meta-item">' +
             '<div class="row">' +
                 '<div class="col-md-5">' +
                     '<div class="cl-form-group">' +
-                        '<input type="text" placeholder="Пример: description" class="cl-input" name="name">' +
+                        '<input type="text" placeholder="Пример: '+ (type === 'og-tags' ? 'og:title' : 'description') +'" class="cl-input" name="name">' +
                     '</div>' +
                 '</div>' +
                 '<div class="col-md-5">' +
                     '<div class="cl-form-group">' +
-                        '<input type="text" placeholder="Пример: smart-описание" class="cl-input" name="value">' +
+                        '<input type="text" placeholder="Пример: '+ (type === 'og-tags' ? 'smart' : 'smart-описание') +'" class="cl-input" name="value">' +
                     '</div>' +
                 '</div>' +
                 '<div class="col-md-2 text-center">' +
@@ -150,17 +208,53 @@ function cancel(type){
     };
     $.ajax(tObj);
 }
-function tagsPreview(type){
+function tagsPreview(){
     var modal = $('#modal-preview-tags');
-    var form = type === 'meta-tags' ? $('#meta-tag-form') : $('#og-tag-form');
-    var data = '';
-    form.find('.block-meta-item').each(function(idx, obj){
-       var elem = $(obj);
-       data += type === 'meta-tags'
-           ? '<meta name="'+ elem.find('input[name="name"]').val() +'" content="'+ elem.find('input[name="value"]').val() +'">\n'
-           : '<meta property="'+ elem.find('input[name="name"]').val() +'" content="'+ elem.find('input[name="value"]').val() +'">\n'
+    var meta_form = $('#meta-tag-form');
+    var og_form = $('#og-tag-form');
+    var charset = $('#main-form').find('input[name="charset"]').val().trim();
+    var data;
+    if (charset.length > 0){
+        data = '<meta charset="'+ charset +'">\n';
+    }
+    meta_form.find('.block-meta-item').each(function(idx, obj){
+       data += _generateMetaElement($(obj), 'meta-tags');
     });
-
+    data += '\n';
+    og_form.find('.block-meta-item').each(function(idx, obj){
+        data += _generateMetaElement($(obj), 'og-tags');
+    });
     modal.find('pre code').text(data);
     modal.modal('show');
 }
+function _generateMetaElement(elem, type){
+    var name = elem.find('input[name="name"]').val().trim();
+    var value = elem.find('input[name="value"]').val().trim();
+    if (name.length > 0 && value.length > 0){
+        if (type === 'meta-tags'){
+            return '<meta name="'+ name +'" content="'+ value +'">\n';
+        }
+        return '<meta property="'+ name +'" content="'+ value +'">\n';
+    }
+    return '';
+}
+
+$('document').on('click', '.cl-template-item', function(e){
+    e.preventDefault();
+    var form = $('#template-form');
+    var url = form.attr('action');
+    var tObj = Object.create(ajaxTpl);
+    tObj.url = url;
+    tObj.data.action = 'get-css-template';
+    tObj.data.path = $(this).attr('href');
+    tObj.success = function(data){
+        if (!data.success){
+            loading('hide');
+            notify.showNotification({
+                text: data.message,
+                type: 'error'
+            });
+        }
+    }
+    $.ajax(tObj);
+});

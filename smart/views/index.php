@@ -27,24 +27,20 @@
         <div class="content">
             <div class="container">
                 <div class="row">
-                    <div class="col-md-12">
-                        <h1 class="title"><span></span></h1>
-                    </div>
-                </div>
-                <div class="row">
                     <div class="cl-tab-container">
                         <div class="col-md-3">
                             <ul class="cl-tab-nav">
                                 <li class="active"><a data-toggle="tab" href="#panel1"><i class="fal fa-home"></i><span>Основные</span></a></li>
-                                <li><a data-toggle="tab" href="#panel2"><i class="fal fa-info"></i><span>Мета-теги</span></a></li>
-                                <li><a data-toggle="tab" href="#panel3"><i class="fal fa-share-square"></i><span>Open Graph</span></a></li>
-                                <li><a data-toggle="tab" href="#panel4"><i class="fal fa-chart-bar"></i><span>Метрики</span></a></li>
-                                <li><a data-toggle="tab" href="#panel5"><i class="fal fa-file-image"></i><span>Favicon</span></a></li>
-                                <li><a data-toggle="tab" href="#panel6"><i class="fal fa-robot"></i><span>Robots.txt</span></a></li>
-                                <li><a data-toggle="tab" href="#panel7"><i class="fal fa-code"></i><span>Код</span></a></li>
+                                <li><a href="#panel2"><i class="fal fa-info"></i><span>Мета-теги</span></a></li>
+                                <li><a href="#panel3"><i class="fal fa-share-square"></i><span>Open Graph</span></a></li>
+                                <li><a href="#panel4"><i class="fal fa-chart-bar"></i><span>Метрики</span></a></li>
+                                <li><a href="#panel5"><i class="fal fa-file-image"></i><span>Favicon</span></a></li>
+                                <li><a href="#panel6"><i class="fal fa-robot"></i><span>Robots.txt</span></a></li>
+                                <li><a href="#panel7"><i class="fal fa-code"></i><span>Код</span></a></li>
+                                <li><a href="#panel8"><i class="fal fa-file-code"></i><span>Шаблоны</span></a></li>
                             </ul>
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-9 cl-tab-content">
                             <div class="tab-content">
                                 <div id="panel1" class="tab-pane fade in active">
                                     <form id="main-form" action="<?= $this->getBaseUrl().'/smart/handler' ?>" method="post">
@@ -123,41 +119,127 @@
                                         </div>
 
                                         <button type="button" class="btn btn-main" onclick="saveMetaTagTab();">Сохранить</button>
-                                        <button type="button" class="btn btn-default" onclick="tagsPreview('meta-tags')">Просмотр</button>
+                                        <button type="button" class="btn btn-default" onclick="tagsPreview()">Просмотр</button>
                                         <button type="button" class="btn btn-default" onclick="cancel('meta-tags')">Отмена</button>
                                     </form>
                                 </div>
                                 <div id="panel3" class="tab-pane fade">
-                                    <form id="og-tag-form" action="action.php" method="post">
+                                    <form id="og-tag-form" action="<?= $this->getBaseUrl().'/smart/handler' ?>" method="post">
                                         <div class="row">
                                             <div class="col-md-5"><label class="cl-label" for="">Название мета-тега</label></div>
                                             <div class="col-md-5"><label class="cl-label" for="">Значение мета-тега</label></div>
                                         </div>
                                         <div class="block-meta">
-
+                                            <?php if (empty($this->getParam('og-tags'))) { ?>
+                                                <div class="block-meta-item">
+                                                    <div class="row">
+                                                        <div class="col-md-5">
+                                                            <div class="cl-form-group">
+                                                                <input type="text" placeholder="Пример: og:title" class="cl-input" name="name">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-5">
+                                                            <div class="cl-form-group">
+                                                                <input type="text" placeholder="Пример: smart" class="cl-input" name="value">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 text-center">
+                                                            <a href="#" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php } else { ?>
+                                                <?php foreach ($this->getParam('og-tags') as $name => $value) { ?>
+                                                    <div class="block-meta-item">
+                                                        <div class="row">
+                                                            <input type="hidden" name="type" value="meta_tags">
+                                                            <div class="col-md-5">
+                                                                <div class="cl-form-group">
+                                                                    <input type="text" placeholder="Пример: og:title" class="cl-input" name="name" value="<?= $name ?>">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                <div class="cl-form-group">
+                                                                    <input type="text" placeholder="Пример: smart" class="cl-input" name="value" value="<?= $value ?>">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-2 text-center">
+                                                                <a href="#" class="meta-times" onclick="removeMetaBlock(this);"><i class="fal fa-times-circle"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <?php } ?>
+                                            <?php } ?>
                                         </div>
 
                                         <div class="row">
                                             <div class="col-md-10 text-center">
-                                                <a href="#" class="meta-plus" onclick="addMetaBlock(this, 'og_tags');"><i class="fal fa-plus-circle"></i></a>
+                                                <a href="#" class="meta-plus" onclick="addMetaBlock(this, 'og-tags');"><i class="fal fa-plus-circle"></i></a>
                                             </div>
                                         </div>
 
                                         <button type="button" class="btn btn-main" onclick="saveOGTagTab();">Сохранить</button>
-                                        <button type="button" class="btn btn-default launch-demo-og-tag">Демо</button>
+                                        <button type="button" class="btn btn-default" onclick="tagsPreview()">Просмотр</button>
+                                        <button type="button" class="btn btn-default" onclick="cancel('og-tags')">Отмена</button>
                                     </form>
                                 </div>
                                 <div id="panel4" class="tab-pane fade">
-                                    <h2>Метрики</h2>
+                                    <form id="metrics-form" action="<?= $this->getBaseUrl().'/smart/handler' ?>" method="post">
+                                        <div class="cl-form-group">
+                                            <label class="cl-label" for="metrics">Код метрик для вставки</label>
+                                            <textarea class="cl-input" name="metrics" id="metrics"><?= $this->getParam('metrics') ?></textarea>
+                                        </div>
+                                        <button type="button" class="btn btn-main" onclick="saveMetricsTab();">Сохранить</button>
+                                    </form>
                                 </div>
                                 <div id="panel5" class="tab-pane fade">
                                    <h2>Favicon</h2>
                                 </div>
                                 <div id="panel6" class="tab-pane fade">
-                                    <h2>Robots.txt</h2>
+                                    <form id="robots-form" action="<?= $this->getBaseUrl().'/smart/handler' ?>" method="post">
+                                        <div class="cl-form-group">
+                                            <label class="cl-label" for="robots">Содержимое файла robots.txt</label>
+                                            <textarea class="cl-input" name="robots" id="robots"><?= $this->getRobots() ?></textarea>
+                                        </div>
+                                        <button type="button" class="btn btn-main" onclick="saveRobotsTab();">Сохранить</button>
+                                    </form>
                                 </div>
                                 <div id="panel7" class="tab-pane fade">
-                                    <h2>Code</h2>
+                                    <form id="code-form" action="<?= $this->getBaseUrl().'/smart/handler' ?>" method="post">
+                                        <div class="cl-form-group">
+                                            <label class="cl-label" for="head-code">Код для вставки в шапку</label>
+                                            <textarea class="cl-input" name="head-code" id="head-code"><?= $this->getParam('head-code') ?></textarea>
+                                        </div>
+                                        <div class="cl-form-group">
+                                            <label class="cl-label" for="footer-code">Код для вставки в подвал</label>
+                                            <textarea class="cl-input" name="footer-code" id="footer-code"><?= $this->getParam('footer-code') ?></textarea>
+                                        </div>
+                                        <button type="button" class="btn btn-main" onclick="saveCodeTab();">Сохранить</button>
+                                    </form>
+                                </div>
+                                <div id="panel8" class="tab-pane fade">
+                                    <form id="template-form" action="<?= $this->getBaseUrl().'/smart/handler' ?>" method="post">
+                                        <h2>Шаблоны</h2>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <ul class="list-group cl-template-list">
+                                                    <?php if (!empty($this->getApplicationCssList())) { ?>
+                                                        <?php foreach ($this->getApplicationCssList() as $file) { ?>
+                                                            <li class="list-group-item"><a class="cl-template-item" href="#<?= $file ?>"><?= $file ?></a></li>
+                                                        <?php } ?>
+                                                    <?php } else { ?>
+                                                        <li class="list-group-item">Не найдено стилей</li>
+                                                    <?php } ?>
+                                                </ul>
+                                            </div>
+                                            <div class="col-md-9 cl-template">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="clearfix"></div>
+                                        <button type="button" class="btn btn-main" onclick="saveCodeTab();">Сохранить</button>
+                                    </form>
                                 </div>
                             </div>
                         </div>

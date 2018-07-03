@@ -96,12 +96,71 @@ class Application
     {
         return array_key_exists($name, $this->_config) ? $this->_config[$name] : '';
     }
-    public function setParam($name, $value){
-        if (($name == 'meta-tags' || $name == 'og-tags') && !is_array($value)){
+
+    public function setParam($name, $value)
+    {
+        if (($name == 'meta-tags' || $name == 'og-tags') && !is_array($value)) {
             $value = [];
         }
         $this->_config[$name] = $value;
     }
+
+    public function renderHead()
+    {
+        echo "<meta charset=\"{$this->getParam('charset')}\">\n";
+        foreach ($this->getParam('meta-tags') as $name => $value) {
+            echo "<meta name=\"$name\" content=\"$value\">\n";
+        }
+        foreach ($this->getParam('og-tags') as $name => $value) {
+            echo "<meta property=\"$name\" content=\"$value\">\n";
+        }
+        echo "<title>{$this->getParam('title')}</title>\n";
+    }
+
+    public function getRobots()
+    {
+        $robotsFile = Loader::$rootDir . DIRECTORY_SEPARATOR . 'robots.txt';
+        return is_file($robotsFile) ? file_get_contents($robotsFile) : '';
+    }
+
+    public function setRobots($content)
+    {
+        $robotsFile = Loader::$rootDir . DIRECTORY_SEPARATOR . 'robots.txt';
+        file_put_contents($robotsFile, $content, LOCK_EX);
+    }
+
+    private $_appCssList;
+    public function getApplicationCssList()
+    {
+        if ($this->_appCssList == null){
+            $cssDirectory = Loader::$rootDir . DIRECTORY_SEPARATOR . 'css';
+            $this->_appCssList = $this->scanDir($cssDirectory);
+        }
+        return $this->_appCssList;
+    }
+
+    private function scanDir($dir, $includePath = false)
+    {
+        $handle = opendir($dir);
+        if ($handle === false) {
+            throw new Exception("Невозможно открыть директорию: $dir");
+        }
+        $list = [];
+        while (($file = readdir($handle)) !== false) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+            $path = $dir . DIRECTORY_SEPARATOR . $file;
+            if (is_file($path) && pathinfo($path, PATHINFO_EXTENSION) == 'css') {
+                $list[] = str_replace(Loader::$rootDir . DIRECTORY_SEPARATOR . 'css'.DIRECTORY_SEPARATOR, '', $path);
+            } elseif (is_dir($path)) {
+                $list = array_merge($list, $this->scanDir($path, true));
+            }
+        }
+        closedir($handle);
+        return $list;
+    }
+
 
     private function loadConfiguration()
     {
