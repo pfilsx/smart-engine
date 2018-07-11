@@ -139,7 +139,17 @@ class Application
         return $this->_appCssList;
     }
 
-    private function scanDir($dir, $includePath = false)
+    public function renderApplicationCssList(){
+        if (!empty($this->getApplicationCssList())) {
+           foreach ($this->getApplicationCssList() as $file) {
+              echo "<li class=\"list-group-item\"><a class=\"cl-template-item\" href=\"#{$file}\">{$file}</a></li>";
+           }
+        } else {
+           echo '<li class="list-group-item">Не найдено стилей</li>';
+        }
+    }
+
+    private function scanDir($dir)
     {
         $handle = opendir($dir);
         if ($handle === false) {
@@ -154,7 +164,7 @@ class Application
             if (is_file($path) && pathinfo($path, PATHINFO_EXTENSION) == 'css') {
                 $list[] = str_replace(Loader::$rootDir . DIRECTORY_SEPARATOR . 'css'.DIRECTORY_SEPARATOR, '', $path);
             } elseif (is_dir($path)) {
-                $list = array_merge($list, $this->scanDir($path, true));
+                $list = array_merge($list, $this->scanDir($path));
             }
         }
         closedir($handle);

@@ -130,6 +130,16 @@ function saveCodeTab(){
     tObj.data.data = form.serializeArray();
     $.ajax(tObj);
 }
+function saveTemplateTab(){
+    var form = $('#template-form');
+    var url = form.attr('action');
+    var tObj = Object.create(ajaxTpl);
+    tObj.url = url;
+    tObj.data.action = 'template-tab';
+    tObj.data.path = $('.active .cl-template-item').attr('href').replace('#', '');
+    tObj.data.content = $('.cl-template').val();
+    $.ajax(tObj);
+}
 /**
  * Remove meta block
  * @param obj
@@ -239,14 +249,15 @@ function _generateMetaElement(elem, type){
     return '';
 }
 
-$('document').on('click', '.cl-template-item', function(e){
+$(document).on('click', '.cl-template-item', function(e){
     e.preventDefault();
+    var elem = $(this);
     var form = $('#template-form');
     var url = form.attr('action');
     var tObj = Object.create(ajaxTpl);
     tObj.url = url;
     tObj.data.action = 'get-css-template';
-    tObj.data.path = $(this).attr('href');
+    tObj.data.path = elem.attr('href').replace('#', '');
     tObj.success = function(data){
         if (!data.success){
             loading('hide');
@@ -254,7 +265,12 @@ $('document').on('click', '.cl-template-item', function(e){
                 text: data.message,
                 type: 'error'
             });
+        } else {
+            loading('hide');
+            $('.cl-template-item').not(elem).closest('li').removeClass('active');
+            elem.closest('li').addClass('active');
+            $('.cl-template').val(data.content);
         }
-    }
+    };
     $.ajax(tObj);
 });

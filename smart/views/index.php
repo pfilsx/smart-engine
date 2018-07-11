@@ -223,22 +223,16 @@
                                         <div class="row">
                                             <div class="col-md-3">
                                                 <ul class="list-group cl-template-list">
-                                                    <?php if (!empty($this->getApplicationCssList())) { ?>
-                                                        <?php foreach ($this->getApplicationCssList() as $file) { ?>
-                                                            <li class="list-group-item"><a class="cl-template-item" href="#<?= $file ?>"><?= $file ?></a></li>
-                                                        <?php } ?>
-                                                    <?php } else { ?>
-                                                        <li class="list-group-item">Не найдено стилей</li>
-                                                    <?php } ?>
+                                                    <?php $this->renderApplicationCssList() ?>
                                                 </ul>
                                             </div>
-                                            <div class="col-md-9 cl-template">
-
+                                            <div class="col-md-9">
+                                                <textarea class="cl-template"></textarea>
                                             </div>
                                         </div>
 
                                         <div class="clearfix"></div>
-                                        <button type="button" class="btn btn-main" onclick="saveCodeTab();">Сохранить</button>
+                                        <button type="button" class="btn btn-main" onclick="saveTemplateTab();">Сохранить</button>
                                     </form>
                                 </div>
                             </div>

@@ -101,6 +101,10 @@ input::-webkit-input-placeholder {
   -o-transition: all ease-in-out 0.1s;
   transition: all ease-in-out 0.1s;
   outline: none !important;
+  &:-webkit-autofill, &:-webkit-autofill:hover, &:-webkit-autofill:focus, &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-transition: background-color 5000s ease-in-out 0s;
+  }
 }
 textarea.cl-input {
   resize: vertical;
@@ -269,7 +273,6 @@ textarea.cl-input {
   min-height: 400px;
   border: 0;
   border-radius: 1px;
-  padding: 2px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   li{
     border: 0;
@@ -278,7 +281,7 @@ textarea.cl-input {
     padding: 0;
     a {
       color: #333;
-      padding: 10px 15px;
+      padding: 10px 5px;
       text-decoration: none !important;
       display: block;
     }
@@ -304,5 +307,19 @@ textarea.cl-input {
         color:#fff;
       }
     }
+  }
+}
+.cl-template {
+  height: 100%;
+  width: 100%;
+  min-height: 400px;
+  max-height: 800px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  overflow-x: hidden;
+  border: 0;
+  resize: none;
+  padding: 5px;
+  &:focus, &:active, &:hover {
+    outline: none;
   }
 }
