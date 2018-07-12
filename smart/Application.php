@@ -6,7 +6,7 @@ namespace smart;
 use Exception;
 use Loader;
 
-
+defined('SMART_DEBUG') || define('SMART_DEBUG', false);
 /**
  * @property array $config
  */
@@ -47,7 +47,8 @@ class Application
             'smart/index' => $smartPath . DIRECTORY_SEPARATOR . 'index.php',
             'smart/login' => $smartPath . DIRECTORY_SEPARATOR . 'login.php',
             'smart/logout' => $smartPath . DIRECTORY_SEPARATOR . 'login.php',
-            'smart/handler' => $smartPath . DIRECTORY_SEPARATOR . 'handler.php'
+            'smart/handler' => $smartPath . DIRECTORY_SEPARATOR . 'handler.php',
+            'smart/404' => $smartPath . DIRECTORY_SEPARATOR . '404.php'
         ];
         if (is_file($this->_configurationFile)) {
             $this->loadConfiguration();
@@ -136,9 +137,6 @@ class Application
             $cssDirectory = Loader::$rootDir . DIRECTORY_SEPARATOR . 'css';
             $this->scanDir($cssDirectory, $this->_appCssList);
         }
-//        ob_end_clean();
-//        var_dump($this->_appCssList);
-//        die();
         return $this->_appCssList;
     }
 
@@ -229,7 +227,17 @@ class Application
                 return $resultRoute;
             }
         }
-        throw new Exception("View script not found: '$resultRoute'");
+        if (!SMART_DEBUG){
+            if (strpos($route, 'smart/') !== false){
+                header("Location: {$this->getBaseUrl()}/smart/404");
+                exit();
+            } else {
+                header("Location: {$this->getBaseUrl()}");
+                exit();
+            }
+        } else {
+            throw new Exception("View script not found: '$resultRoute'");
+        }
     }
 
     public function getBaseUrl()
