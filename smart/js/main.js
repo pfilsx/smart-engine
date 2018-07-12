@@ -251,6 +251,7 @@ function _generateMetaElement(elem, type){
 
 $(document).on('click', '.cl-template-item', function(e){
     e.preventDefault();
+    e.stopPropagation();
     var elem = $(this);
     var form = $('#template-form');
     var url = form.attr('action');
@@ -273,4 +274,16 @@ $(document).on('click', '.cl-template-item', function(e){
         }
     };
     $.ajax(tObj);
+});
+$(document).on('click', '.cl-template-folder', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    var elem = $(this);
+    if (elem.hasClass('opened')){
+        elem.removeClass('opened');
+        elem.find('>ul').hide('fast');
+    } else {
+        elem.addClass('opened');
+        elem.find('>ul').show('fast');
+    }
 });

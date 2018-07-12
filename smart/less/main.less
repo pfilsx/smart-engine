@@ -270,7 +270,8 @@ textarea.cl-input {
   top: 60px;
 }
 .cl-template-list {
-  min-height: 400px;
+  height: 500px;
+  overflow: auto;
   border: 0;
   border-radius: 1px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
@@ -281,7 +282,7 @@ textarea.cl-input {
     padding: 0;
     a {
       color: #333;
-      padding: 10px 5px;
+      padding: 10px 5px 10px 10px;
       text-decoration: none !important;
       display: block;
     }
@@ -289,8 +290,8 @@ textarea.cl-input {
       color: @main_background;
     }
     &.active {
-      background: @main_background !important;
-      color: #fff;
+      color: @main_background;
+      background: #fff !important;
       position: relative;
       &:after {
         content: '';
@@ -304,15 +305,48 @@ textarea.cl-input {
         border-left: 10px solid @main_background;
       }
       a, a:hover, a:active, a:focus {
-        color:#fff;
+        color:@main_background;
       }
+    }
+    i.fal {
+      margin-right: 5px;
+    }
+  }
+}
+.cl-template-folder {
+  span {
+    font-weight: bold;
+    color: #333;
+    padding: 10px 5px 0 10px;
+    text-decoration: none !important;
+    display: block;
+  }
+  ul {
+    padding-left: 0;
+    display: none;
+    li {
+      padding-left: 10px;
+    }
+  }
+  &>span .fa-folder {
+    display: inline-block;
+  }
+  &>span .fa-folder-open {
+    display: none;
+  }
+  &.opened {
+    &>span .fa-folder {
+      display: none;
+    }
+    &>span .fa-folder-open {
+      display: inline-block;
     }
   }
 }
 .cl-template {
   height: 100%;
   width: 100%;
-  min-height: 400px;
+  min-height: 500px;
   max-height: 800px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   overflow-x: hidden;

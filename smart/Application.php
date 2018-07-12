@@ -132,43 +132,62 @@ class Application
     private $_appCssList;
     public function getApplicationCssList()
     {
-        if ($this->_appCssList == null){
+        if (empty($this->_appCssList)){
             $cssDirectory = Loader::$rootDir . DIRECTORY_SEPARATOR . 'css';
-            $this->_appCssList = $this->scanDir($cssDirectory);
+            $this->scanDir($cssDirectory, $this->_appCssList);
         }
+//        ob_end_clean();
+//        var_dump($this->_appCssList);
+//        die();
         return $this->_appCssList;
     }
 
     public function renderApplicationCssList(){
-        if (!empty($this->getApplicationCssList())) {
-           foreach ($this->getApplicationCssList() as $file) {
-              echo "<li class=\"list-group-item\"><a class=\"cl-template-item\" href=\"#{$file}\">{$file}</a></li>";
+        $this->getApplicationCssList();
+        if (!empty($this->_appCssList)) {
+           foreach ($this->_appCssList as $key => $value) {
+               if (is_array($value)){
+                    $this->renderCssDirectory($key, $value);
+               } else {
+                   echo "<li class=\"list-group-item\"><a class=\"cl-template-item\" href=\"#$value\"><i class=\"fal fa-file-code\"></i>$key</a></li>";
+               }
            }
         } else {
-           echo '<li class="list-group-item">Не найдено стилей</li>';
+           echo '<li class="list-group-item" style="padding: 10px;">Не найдено стилей</li>';
         }
     }
+    private function renderCssDirectory($dir, $files){
+        echo "<li class=\"list-group-item cl-template-folder\"><span><i class=\"fal fa-folder-open\"></i><i class=\"fal fa-folder\"></i>{$dir}</span>";
+        echo "<ul>";
+        foreach ($files as $key => $value){
+            if (is_array($value)){
+                $this->renderCssDirectory($key, $value);
+            } else {
+                echo "<li class=\"list-group-item\"><a class=\"cl-template-item\" href=\"#$value\"><i class=\"fal fa-file-code\"></i>$key</a></li>";
+            }
+        }
+        echo "</ul>";
+    }
 
-    private function scanDir($dir)
+    private function scanDir($dir, &$folder)
     {
         $handle = opendir($dir);
         if ($handle === false) {
             throw new Exception("Невозможно открыть директорию: $dir");
         }
-        $list = [];
         while (($file = readdir($handle)) !== false) {
             if ($file === '.' || $file === '..') {
                 continue;
             }
             $path = $dir . DIRECTORY_SEPARATOR . $file;
             if (is_file($path) && pathinfo($path, PATHINFO_EXTENSION) == 'css') {
-                $list[] = str_replace(Loader::$rootDir . DIRECTORY_SEPARATOR . 'css'.DIRECTORY_SEPARATOR, '', $path);
+                $folder[$file] = str_replace(Loader::$rootDir . DIRECTORY_SEPARATOR . 'css'. DIRECTORY_SEPARATOR, '', $path);
             } elseif (is_dir($path)) {
-                $list = array_merge($list, $this->scanDir($path));
+                $folder[$file] = [];
+                $this->scanDir($path, $folder[$file]);
             }
         }
         closedir($handle);
-        return $list;
     }
 
 
