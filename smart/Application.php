@@ -7,8 +7,10 @@ use Exception;
 use Loader;
 
 defined('SMART_DEBUG') || define('SMART_DEBUG', false);
+
 /**
  * @property array $config
+ * @property string|null $requestedRoute
  */
 class Application
 {
@@ -32,6 +34,8 @@ class Application
     private $_scriptUrl;
     private $_smartRoutes;
     private $_user;
+    private $_requestedRoute;
+    private $_errorHandler;
 
     /**
      * @var self
@@ -40,6 +44,8 @@ class Application
 
     public function __construct()
     {
+        $this->_errorHandler = new ErrorHandler();
+        $this->_errorHandler->register($this);
         $this->_configurationFile = implode(DIRECTORY_SEPARATOR, [Loader::$rootDir, 'smart', 'config', 'config.data']);
         $smartPath = implode(DIRECTORY_SEPARATOR, [Loader::$rootDir, 'smart', 'views']);
         $this->_smartRoutes = [
@@ -61,20 +67,11 @@ class Application
 
     public function run()
     {
-        $_file_ = $this->parseRequest();
-        $_obInitialLevel_ = ob_get_level();
-        ob_start();
-        ob_implicit_flush(false);
         try {
-            require $_file_;
-            echo ob_get_clean();
-        } catch (Exception $e) {
-            while (ob_get_level() > $_obInitialLevel_) {
-                if (!@ob_end_clean()) {
-                    ob_clean();
-                }
-            }
-            throw $e;
+            $_file_ = $this->parseRequest();
+            echo $this->renderFile($_file_);
+        } catch (Exception $ex) {
+            echo $this->renderException($ex);
         }
     }
 
@@ -91,6 +88,9 @@ class Application
     public function setUser($value)
     {
         $this->_user = $value;
+    }
+    public function getRequestedRoute(){
+        return $this->_requestedRoute;
     }
 
     public function getParam($name)
@@ -131,34 +131,38 @@ class Application
     }
 
     private $_appCssList;
+
     public function getApplicationCssList()
     {
-        if (empty($this->_appCssList)){
+        if (empty($this->_appCssList)) {
             $cssDirectory = Loader::$rootDir . DIRECTORY_SEPARATOR . 'css';
             $this->scanDir($cssDirectory, $this->_appCssList);
         }
         return $this->_appCssList;
     }
 
-    public function renderApplicationCssList(){
+    public function renderApplicationCssList()
+    {
         $this->getApplicationCssList();
         if (!empty($this->_appCssList)) {
-           foreach ($this->_appCssList as $key => $value) {
-               if (is_array($value)){
+            foreach ($this->_appCssList as $key => $value) {
+                if (is_array($value)) {
                     $this->renderCssDirectory($key, $value);
-               } else {
-                   echo "<li class=\"list-group-item\"><a class=\"cl-template-item\" href=\"#$value\"><i class=\"fal fa-file-code\"></i>$key</a></li>";
-               }
-           }
+                } else {
+                    echo "<li class=\"list-group-item\"><a class=\"cl-template-item\" href=\"#$value\"><i class=\"fal fa-file-code\"></i>$key</a></li>";
+                }
+            }
         } else {
-           echo '<li class="list-group-item" style="padding: 10px;">Не найдено стилей</li>';
+            echo '<li class="list-group-item" style="padding: 10px;">Не найдено стилей</li>';
         }
     }
-    private function renderCssDirectory($dir, $files){
+
+    private function renderCssDirectory($dir, $files)
+    {
         echo "<li class=\"list-group-item cl-template-folder\"><span><i class=\"fal fa-folder-open\"></i><i class=\"fal fa-folder\"></i>{$dir}</span>";
         echo "<ul>";
-        foreach ($files as $key => $value){
-            if (is_array($value)){
+        foreach ($files as $key => $value) {
+            if (is_array($value)) {
                 $this->renderCssDirectory($key, $value);
             } else {
                 echo "<li class=\"list-group-item\"><a class=\"cl-template-item\" href=\"#$value\"><i class=\"fal fa-file-code\"></i>$key</a></li>";
@@ -179,7 +183,7 @@ class Application
             }
             $path = $dir . DIRECTORY_SEPARATOR . $file;
             if (is_file($path) && pathinfo($path, PATHINFO_EXTENSION) == 'css') {
-                $folder[$file] = str_replace(Loader::$rootDir . DIRECTORY_SEPARATOR . 'css'. DIRECTORY_SEPARATOR, '', $path);
+                $folder[$file] = str_replace(Loader::$rootDir . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR, '', $path);
             } elseif (is_dir($path)) {
                 $folder[$file] = [];
                 $this->scanDir($path, $folder[$file]);
@@ -199,23 +203,57 @@ class Application
         file_put_contents($this->_configurationFile, base64_encode(json_encode($this->_config)), LOCK_EX);
     }
 
+    public function renderFile($_file_, $_params_ = [])
+    {
+        $_obInitialLevel_ = ob_get_level();
+        ob_start();
+        ob_implicit_flush(false);
+        extract($_params_, EXTR_OVERWRITE);
+        try {
+            require $_file_;
+            return ob_get_clean();
+        } catch (Exception $e) {
+            while (ob_get_level() > $_obInitialLevel_) {
+                if (!@ob_end_clean()) {
+                    ob_clean();
+                }
+            }
+            throw $e;
+        }
+    }
+
+    private function renderException($ex)
+    {
+        if (is_string($this->_requestedRoute) && strpos($this->_requestedRoute, 'smart') === false) {
+            $_file_ = implode(DIRECTORY_SEPARATOR, [Loader::$rootDir, 'views', 'error.php']);
+            if (!is_file($_file_)){
+                $_file_ = null;
+            }
+        }
+        if (empty($_file_)) {
+            $_file_ = implode(DIRECTORY_SEPARATOR, [Loader::$rootDir, 'smart', 'views', 'error.php']);
+        }
+        return $this->renderFile($_file_, ['exception' => $ex]);
+    }
+
+    //region request
     private function parseRequest()
     {
         $request = $_SERVER['REQUEST_URI'];
         $requestParts = explode('?', $request);
         $baseRoute = rtrim($requestParts[0], '/');
-        $route = trim(str_replace($this->getBaseUrl(), '', $baseRoute), '/');
+        $this->_requestedRoute = trim(str_replace($this->getBaseUrl(), '', $baseRoute), '/');
 
-        if (array_key_exists($route, $this->_smartRoutes)) {
+        if (array_key_exists($this->_requestedRoute, $this->_smartRoutes)) {
             if (!$this->_user->isLoggedIn()) {
                 return $this->_smartRoutes['smart/login'];
             }
-            return $this->_smartRoutes[$route];
+            return $this->_smartRoutes[$this->_requestedRoute];
         }
         $resultRoute = implode(DIRECTORY_SEPARATOR, [
             Loader::$rootDir,
             'views',
-            (empty($route) ? 'index' : str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $route))
+            (empty($this->_requestedRoute) ? 'index' : str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $this->_requestedRoute))
         ]);
         if (is_file($resultRoute)) {
             return $resultRoute;
@@ -227,8 +265,8 @@ class Application
                 return $resultRoute;
             }
         }
-        if (!SMART_DEBUG){
-            if (strpos($route, 'smart/') !== false){
+        if (!SMART_DEBUG) {
+            if (strpos($this->_requestedRoute, 'smart') !== false) {
                 header("Location: {$this->getBaseUrl()}/smart/404");
                 exit();
             } else {
@@ -278,6 +316,7 @@ class Application
             throw new Exception('Unable to determine the entry script file path.');
         }
     }
+    //endregion
 
     //region magic
     public function __get($name)
