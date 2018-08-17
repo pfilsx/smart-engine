@@ -193,7 +193,20 @@
                                     </form>
                                 </div>
                                 <div id="panel5" class="tab-pane fade">
-                                   <h2>Favicon</h2>
+                                    <form id="favicon-form" action="<?= $this->getBaseUrl().'/smart/handler' ?>" method="post">
+                                        <div class="cl-form-group">
+                                            <label class="cl-label">Favicon для вашего сайта</label>
+                                            <div class="cl-file-input">
+                                                <div class="btn btn-primary btn-sm pull-left">
+                                                    <span>Выберите файл</span>
+                                                    <input name="favicon" id="favicon" type="file" accept="image/vnd.microsoft.icon"/>
+                                                </div>
+                                                <div class="file-text"><?= $this->getParam('favicon') ?></div>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                        <button type="button" class="btn btn-main" onclick="saveFaviconTab();">Сохранить</button>
+                                    </form>
                                 </div>
                                 <div id="panel6" class="tab-pane fade">
                                     <form id="robots-form" action="<?= $this->getBaseUrl().'/smart/handler' ?>" method="post">

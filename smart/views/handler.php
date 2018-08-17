@@ -47,6 +47,22 @@ try {
                     die(json_encode(['success' => true, 'message' => 'Изменения успешно сохранены']));
                 die(json_encode(['success' => false, 'message' => 'Произошла ошибка: не удалось сохранить файл']));
             }
+        case 'favicon-tab':
+            {
+                if (!isset($_FILES['icon'])){
+                    die(json_encode(['success' => false, 'message' => 'Произошла ошибка: не заданы параметры для выполнения']));
+                }
+                $file = $_FILES['icon'];
+                if ($file['type'] != 'image/vnd.microsoft.icon'){
+                    die(json_encode(['success' => false, 'message' => 'Произошла ошибка: загружен файл неверного формата']));
+                }
+                if (move_uploaded_file($file['tmp_name'], Loader::$rootDir.DIRECTORY_SEPARATOR.$file['name'])){
+                    \smart\Application::$instance->setParam('favicon', $file['name']);
+                    $this->saveConfiguration();
+                    die(json_encode(['success' => true, 'message' => 'Изменения успешно сохранены']));
+                }
+                die(json_encode(['success' => false, 'message' => 'Произошла ошибка: не удалось сохранить файл']));
+            }
         case 'main-tab':
         case 'meta-tab':
         case 'og-tab':

@@ -140,6 +140,35 @@ function saveTemplateTab(){
     tObj.data.content = $('.cl-template').val();
     $.ajax(tObj);
 }
+function saveFaviconTab(){
+    var form = $('#favicon-form');
+    var url = form.attr('action');
+    var favicon = form.find('#favicon')[0].files[0];
+    if (favicon === undefined){
+        notify.showNotification({
+            text: 'Необходимо выбрать файл',
+            type: 'error'
+        });
+        return;
+    }
+    if (favicon.type != 'image/vnd.microsoft.icon'){
+        notify.showNotification({
+            text: 'Необходимо выбрать файл типа .ico',
+            type: 'error'
+        });
+        return;
+    }
+    var form_data = new FormData();
+    form_data.append('icon', favicon);
+    form_data.append('action', 'favicon-tab');
+    var tObj = Object.create(ajaxTpl);
+    tObj.url = url;
+    tObj.data = form_data;
+    tObj.cache = false;
+    tObj.contentType = false;
+    tObj.processData = false;
+    $.ajax(tObj);
+}
 /**
  * Remove meta block
  * @param obj
@@ -285,5 +314,14 @@ $(document).on('click', '.cl-template-folder', function(e){
     } else {
         elem.addClass('opened');
         elem.find('>ul').show('fast');
+    }
+});
+$(document).on('change', '.cl-file-input input[type=file]', function(){
+    var elem = $(this);
+    var text = elem.closest('.cl-file-input').find('.file-text');
+    if (elem[0].files.length === 1){
+        text.text(elem[0].files[0].name);
+    } else {
+        text.text('');
     }
 });

@@ -26,7 +26,8 @@ class Application
         'og-tags' => [],
         'metrics' => '',
         'head-code' => '',
-        'footer-code' => ''
+        'footer-code' => '',
+        'favicon' => 'favicon.ico'
     ];
     private $_configurationFile;
 
@@ -115,6 +116,8 @@ class Application
         foreach ($this->getParam('og-tags') as $name => $value) {
             echo "<meta property=\"$name\" content=\"$value\">\n";
         }
+        $faviconLink = $this->_baseUrl.'/'.$this->getParam('favicon');
+        echo "<link rel=\"shortcut icon\" href=\"{$faviconLink}\" sizes=\"16x16\" type=\"image/vnd.microsoft.icon\">";
         echo "<title>{$this->getParam('title')}</title>\n";
     }
 

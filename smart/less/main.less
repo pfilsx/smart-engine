@@ -106,6 +106,34 @@ input::-webkit-input-placeholder {
     -webkit-transition: background-color 5000s ease-in-out 0s;
   }
 }
+.cl-file-input {
+  position: relative;
+  margin-top: 5px;
+}
+.cl-file-input .btn {
+  position: relative;
+  margin-right: 15px;
+}
+.cl-file-input input{
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  opacity: 0;
+}
+.cl-file-input .file-text {
+  height: 30px;
+  overflow: hidden;
+  border-bottom: 1px solid @main_background;
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+}
 textarea.cl-input {
   resize: vertical;
   height: 153px;
